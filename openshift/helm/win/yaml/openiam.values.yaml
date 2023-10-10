@@ -1,0 +1,512 @@
+# Default values for openiam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+ingress:
+  enabled: false
+openiam:
+  ui:
+    javaOpts: "-Dlogging.level.root=%LOGGING_LEVEL% -Dlogging.level.org.openiam=%LOGGING_LEVEL%"
+    replicas: 1
+    resources:
+      requests:
+        memory: "3072Mi"
+      limits:
+        memory: "3072Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  esb:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+    resources:
+      requests:
+        memory: "2304Mi"
+      limits:
+        memory: "2304Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+
+    hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+          - "host.openiam"
+  business_rule_manager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  idm:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  synchronization:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  reconciliation:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  groovy_manager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  http_source_adapter:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL% -Dserver.port=8084 -Dorg.openiam.source.adapter.type=HTTP_SOURCE_ADAPTER'
+
+    resources:
+      requests:
+        memory: "128Mi"
+      limits:
+        memory: "128Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  workflow:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "1228Mi"
+      limits:
+        memory: "1228Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  authmanager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+    resources:
+      requests:
+        memory: "614Mi"
+      limits:
+        memory: "614Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  connectors:
+    salesforce:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    ldap:
+      replicas: 1
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    jdbc:
+      replicas: 1
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      labels: { }
+      podAnnotations: { }
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    google:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    aws:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    freshdesk:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    linux:
+      replicas: 1
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    oracle_ebs:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    oracle:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    scim:
+      replicas: 1
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    script:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    rexx:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    saps4hana:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    freshservice:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    tableau:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    oracle_idcs:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    workday:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    adp:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    ipa:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    box:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    boomi:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    lastpass:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    kronos:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    thales:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+    postgresql:
+      replicas: 0
+      javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+      resources:
+        requests:
+          memory: "256Mi"
+        limits:
+          memory: "256Mi"
+      nodeSelector: { }
+      tolerations: [ ]
+      securityContext:
+        fsGroup: null
+  emailmanager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+    resources:
+      requests:
+        memory: "307Mi"
+      limits:
+        memory: "307Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  devicemanager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+    resources:
+      requests:
+        memory: "307Mi"
+      limits:
+        memory: "307Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+  sasmanager:
+    replicas: 1
+    javaOpts: '-Dlogging.level.root=%LOGGING_LEVEL%'
+    resources:
+      requests:
+        memory: "256Mi"
+      limits:
+        memory: "256Mi"
+    nodeSelector: { }
+    tolerations: [ ]
+    securityContext:
+      fsGroup: null
+    servers:
+      first:
+        protocol: %SAS_FIRST_PROTOCOL%
+        server: %SAS_FIRST_SERVER%
+        port: %SAS_FIRST_PORT%
+      second:
+        protocol: %SAS_SECOND_PROTOCOL%
+        server: %SAS_SECOND_SERVER%
+        port: %SAS_SECOND_PORT%
+  image:
+    environment: %BUILD_ENVIRONMENT%
+    pullPolicy: %IMAGE_PULL_POLICY%
+    version: "%OPENIAM_VERSION_NUMBER%"
+    prefix: "%DOCKER_IMAGE_PREFIX%"
+    registry: "%DOCKER_REGISTRY%"
+    registryPrefixSeparator: "%DOCKER_REGISTRY_SEPARATOR%"
+    credentialsJSON:
+    credentials:
+      registry: "%DOCKER_REGISTRY%"
+      username: "%DOCKERHUB_USERNAME%"
+      password: "%DOCKERHUB_PASSWORD%"
+  bash:
+    log:
+      level: "%OPENIAM_BASH_LOG_LEVEL%"

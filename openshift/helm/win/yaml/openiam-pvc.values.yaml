@@ -1,0 +1,71 @@
+# Default values for openiam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+ingress:
+  enabled: false
+openiam:
+  vault:
+    volume:
+      seal:
+        annotations: []
+        size: '10M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+      client:
+        annotations: []
+        size: '10M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+      server:
+        annotations: []
+        size: '10M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+      storage:
+        annotations: []
+        size: '1Gi'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+  groovy_manager:
+    volume:
+      iamscripts:
+        annotations: []
+        size: '10M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+  workflow:
+    volume:
+      activiti:
+        annotations: []
+        size: '5M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+  ldap_connector_rabbitmq:
+    volume:
+      ldap_connector_rabbitmq:
+        annotations: []
+        size: '5M'
+        accessModes:
+          - ReadWriteMany
+        storageClass: ''
+  rabbitmq:
+    volume:
+      annotations: []
+      size: '5M'
+      accessModes:
+        - ReadWriteMany
+      storageClass: ''
+  upload:
+    volume:
+      annotations: [ ]
+      size: '2Gi'
+      accessModes:
+        - ReadWriteMany
+      storageClass: ''

@@ -1,0 +1,13 @@
+primary:
+  podSecurityContext:
+    enabled: false
+
+  containerSecurityContext:
+    runAsUser: null
+
+secondary:
+  podSecurityContext:
+    enabled: false
+
+  containerSecurityContext:
+    runAsUser: null

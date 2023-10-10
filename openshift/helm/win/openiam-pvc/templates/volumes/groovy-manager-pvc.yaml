@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: openiam-pvc-storage-iamscripts
+  labels:
+    app: openiam-pvc-storage-iamscripts
+    openiam_collect_logs: 'true'
+spec:
+  accessModes:
+  {{- range .Values.openiam.groovy_manager.volume.iamscripts.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.openiam.groovy_manager.volume.iamscripts.size | quote }}
+{{- if .Values.openiam.groovy_manager.volume.iamscripts.storageClass }}
+{{- if (eq "-" .Values.openiam.groovy_manager.volume.iamscripts.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.openiam.groovy_manager.volume.iamscripts.storageClass }}"
+{{- end }}
+{{- end }}

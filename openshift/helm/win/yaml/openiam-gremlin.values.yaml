@@ -1,0 +1,31 @@
+# Default values for openiam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ingress:
+  enabled: false
+openiam:
+  appname: "openiam"
+  gremlin:
+    replicas: 3
+    nodeSelector: {}
+    tolerations: []
+    resources:
+      requests:
+        memory: "1024Mi"
+      limits:
+        memory: "1024Mi"
+  image:
+    environment: %BUILD_ENVIRONMENT%
+    pullPolicy: %IMAGE_PULL_POLICY%
+    version: "%OPENIAM_VERSION_NUMBER%"
+    prefix: "%DOCKER_IMAGE_PREFIX%"
+    registry: "%DOCKER_REGISTRY%"
+    registryPrefixSeparator: "%DOCKER_REGISTRY_SEPARATOR%"
+    credentialsJSON:
+    credentials:
+      registry: "%DOCKER_REGISTRY%"
+      username: "%DOCKERHUB_USERNAME%"
+      password: "%DOCKERHUB_PASSWORD%"
+  gke:
+    project:
+      id: %GOOGLE_PROJECT%

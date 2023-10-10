@@ -1,0 +1,468 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: openiam-template
+parameters:
+  - name: BUILD_ENVIRONMENT
+    displayName: Build environment
+    description: Build environment
+    value: qa
+    required: true
+  - name: OPENIAM_VERSION_NUMBER
+    displayName: OpenIAM version number
+    description: OpenIAM version number
+    value: 4.2.1.1
+    required: true
+  - name: OPENIAM_BASH_LOG_LEVEL
+    displayName: Openiam bash log level
+    description: Openiam bash log level
+    value: INFO
+    required: true
+  - name: APP_NAME
+    displayName: Application name
+    description: Application name
+    value: open-iam
+    required: true
+  - name: DOCKER_IMAGE_PREFIX
+    displayName: Docker image prefix
+    description: Docker image prefix
+    value: openiamdocker
+    required: true
+  - name: DOCKER_REGISTRY
+    displayName: Docker registry
+    description: Docker registry
+    value: docker.io
+    required: true
+
+  - name: OPENIAM_DB_NAME
+    displayName: OpenIAM DB name
+    description: OpenIAM DB name
+    value: openiam
+    required: true
+  - name: OPENIAM_DB_USERNAME
+    displayName: OpenIAM DB username
+    description: OpenIAM DB username
+    value: IAMUSER
+    required: true
+  - name: OPENIAM_DB_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: OpenIAM DB password
+
+  - name: ACTIVITI_DB_NAME
+    displayName: Activiti DB name
+    description: Activiti DB name
+    value: activiti
+    required: true
+  - name: ACTIVITI_DB_USERNAME
+    displayName: Activiti DB username
+    description: Activiti DB username
+    value: ACTIVITI
+    required: true
+  - name: ACTIVITI_DB_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Activiti DB password
+
+  - name: DB_ROOT_USER
+    displayName: DB root username
+    description: DB root username
+    value: openiam
+    required: true
+  - name: DB_ROOT_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: DB root password
+
+  - name: RABBITMQ_HOST
+    displayName: Rabbitmq host
+    description: Rabbitmq host
+    value: ${APP_NAME}-rabbitmq
+    required: true
+  - name: RABBITMQ_USERNAME
+    displayName: Rabbitmq username
+    description: Rabbitmq username
+    value: openiam
+    required: true
+  - name: RABBITMQ_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Rabbitmq password
+  - name: RABBIT_JKS_KEY_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Rabbit jks key password
+
+  - name: IMAGE_PULL_POLICY
+    displayName: Image pull policy
+    description: Image pull policy
+    value: Always
+    required: true
+  - name: VAULT_KEYPASS
+    displayName: Java keystore password
+    description: Java keystore password
+    value: changeit
+    required: true
+  - name: DOCKERHUB_USERNAME
+    displayName: DockerHub user name
+    description: DockerHub user name
+    value: https://github.com/sclorg/cakephp-ex.git
+    required: true
+  - name: REDIS_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Redis password
+
+  - name: JKS_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: JKS password
+  - name: JKS_KEY_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: JKS key password
+  - name: COOKIE_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Cookie key password
+  - name: COMMON_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Common key password
+  - name: VAULT_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Vault key password
+
+  - name: CASSANDRA_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Cassandra jks key password
+  - name: CASSANDRA_PERISTENT_SIZE
+    displayName: Cassandra persistent size
+    description: Cassandra persistent size
+    value: 5Gi
+    required: true
+  - name: CASSANDRA_SERVICE_NODEPRORT_CQL
+    displayName: Cassandra service nodeport cql
+    description: Cassandra service nodeport cql
+    value: "9042"
+    required: true
+  - name: CASSANDRA_REPLICA_COUNT
+    displayName: Cassandra replica count
+    description: Cassandra replica count
+    value: "1"
+    required: true
+
+
+objects:
+
+    # ------------------ secrets --------------------
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: secrets
+    type: Opaque
+    stringData:
+      openiamDatabaseUserName: ${{OPENIAM_DB_USERNAME}}
+      activitiDatabaseUserName: ${{ACTIVITI_DB_USERNAME}}
+      openiamDatabasePassword: ${{OPENIAM_DB_PASSWORD}}
+      activitiDatabasePassword: ${{ACTIVITI_DB_PASSWORD}}
+      rabbitmqUserName: ${{RABBITMQ_USERNAME}}
+      rabbitmqPassword: ${{RABBITMQ_PASSWORD}}
+      rabbitmqJksKeyPassword: ${{RABBIT_JKS_KEY_PASSWORD}}
+      databaseRootUserName: ${{DB_ROOT_USER}}
+      databaseRootPassword: ${{DB_ROOT_PASSWORD}}
+      redis-database-service-name:
+      redis-memory-limit:
+      redis-name-space:
+      redis-version:
+      redis-volume-capacity:
+      redisPassword: ${{REDIS_PASSWORD}}
+      flywayOpeniamUserName: ${{OPENIAM_DB_USERNAME}}
+      flywayActivitiUserName: ${{ACTIVITI_DB_USERNAME}}
+      flywayOpeniamPassword: ${{OPENIAM_DB_PASSWORD}}
+      flywayActivitiPassword: ${{ACTIVITI_DB_PASSWORD}}
+      javaKeystorePassword: ${{VAULT_KEYPASS}}
+      jksPassword: ${{JKS_PASSWORD}}
+      jksKeyPassword: ${{JKS_KEY_PASSWORD}}
+      jksCookieKeyPassword: ${{COOKIE_KEY_PASS}}
+      jksCommonKeyPassword: ${{COMMON_KEY_PASS}}
+      vaultKeyPassword: ${{VAULT_KEY_PASS}}
+      cassandraPassword: ${{CASSANDRA_PASSWORD}}
+
+      logLevelRedis: warn
+
+
+# --------------- persistentVolume ---------------
+#
+#  - kind: PersistentVolume
+#    apiVersion: v1
+#    metadata:
+#      name: vault-server-storage-pv
+#    spec:
+#      capacity:
+#        storage: 1Gi
+#      azureDisk:
+#        diskName: openshift-openiam-vault_server_storage
+#        diskURI: >-
+#          /subscriptions/45b00e9e-97e3-4264-ade0-4609a447b712/resourceGroups/openshift_terraform_deploy/providers/Microsoft.Compute/disks/openshift-openiam-vault_server_storage
+#        cachingMode: ReadOnly
+#        fsType: ''
+#        readOnly: false
+#        kind: Managed
+#      accessModes:
+#        - ReadWriteOnce
+#      claimRef:
+#        kind: PersistentVolumeClaim
+#        namespace: ${APP_NAME}
+#        name: vault-server-storage-pvc
+#        apiVersion: v1
+#      persistentVolumeReclaimPolicy: Delete
+#      storageClassName: managed-premium
+#      volumeMode: Filesystem
+#
+#  - kind: PersistentVolume
+#    apiVersion: v1
+#    metadata:
+#      name: vault-client-storage-pv
+#    spec:
+#      capacity:
+#        storage: 1Gi
+#      azureDisk:
+#        diskName: openshift-openiam-vault_client_storage
+#        diskURI: >-
+#          /subscriptions/45b00e9e-97e3-4264-ade0-4609a447b712/resourceGroups/openshift_terraform_deploy/providers/Microsoft.Compute/disks/openshift-openiam-vault_client_storage
+#        cachingMode: ReadOnly
+#        fsType: ''
+#        readOnly: false
+#        kind: Managed
+#      accessModes:
+#        - ReadWriteOnce
+#      claimRef:
+#        kind: PersistentVolumeClaim
+#        namespace: ${APP_NAME}
+#        name: vault-client-storage-pvc
+#        apiVersion: v1
+#      persistentVolumeReclaimPolicy: Delete
+#      storageClassName: managed-premium
+#      volumeMode: Filesystem
+#
+#  - kind: PersistentVolume
+#    apiVersion: v1
+#    metadata:
+#      name: vault-seal-storage-pv
+#    spec:
+#      capacity:
+#        storage: 1Gi
+#      azureDisk:
+#        diskName: openshift-openiam-vault-seal-storage
+#        diskURI: >-
+#          /subscriptions/45b00e9e-97e3-4264-ade0-4609a447b712/resourceGroups/openshift_terraform_deploy/providers/Microsoft.Compute/disks/openshift-openiam-vault_seal_storage
+#        cachingMode: ReadOnly
+#        fsType: ''
+#        readOnly: false
+#        kind: Managed
+#      accessModes:
+#        - ReadWriteOnce
+#      claimRef:
+#        kind: PersistentVolumeClaim
+#        namespace: ${APP_NAME}
+#        name: vault-seal-storage-pvc
+#        apiVersion: v1
+#      persistentVolumeReclaimPolicy: Delete
+#      storageClassName: managed-premium
+#      volumeMode: Filesystem
+#
+#  - kind: PersistentVolume
+#    apiVersion: v1
+#    metadata:
+#      name: rabbitmq-cert-storage-pv
+#    spec:
+#      capacity:
+#        storage: 1Gi
+#      azureDisk:
+#        diskName: openshift-openiam-rabbitmq_cert_storage
+#        diskURI: >-
+#          /subscriptions/45b00e9e-97e3-4264-ade0-4609a447b712/resourceGroups/openshift_terraform_deploy/providers/Microsoft.Compute/disks/openshift-openiam-rabbitmq_cert_storage
+#        cachingMode: ReadOnly
+#        fsType: ''
+#        readOnly: false
+#        kind: Managed
+#      accessModes:
+#        - ReadWriteOnce
+#      claimRef:
+#        kind: PersistentVolumeClaim
+#        namespace: ${APP_NAME}
+#        name: rabbitmq-cert-storage-pvc
+#        apiVersion: v1
+#      persistentVolumeReclaimPolicy: Delete
+#      storageClassName: managed-premium
+#      volumeMode: Filesystem
+#
+#------------ PersistentVolumeClaim ---------------
+
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: vault-server-storage-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: vault-client-storage-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: vault-seal-storage-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: rabbitmq-cert-storage-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: centos7
+    spec:
+      lookupPolicy:
+        local: false
+      tags:
+        - name: latest
+          annotations:
+            openshift.io/generated-by: OpenShiftWebConsole
+            openshift.io/imported-from: centos/httpd-24-centos7
+          from:
+            kind: DockerImage
+            name: centos/httpd-24-centos7
+          generation: 2
+          importPolicy: { }
+          referencePolicy:
+            type: Local
+
+
+  - kind: DeploymentConfig
+    apiVersion: apps.openshift.io/v1
+    metadata:
+      name: centos7
+    spec:
+      strategy:
+        type: Rolling
+        rollingParams:
+          updatePeriodSeconds: 1
+          intervalSeconds: 1
+          timeoutSeconds: 600
+          maxUnavailable: 25%
+          maxSurge: 25%
+          post:
+            failurePolicy: Abort
+            execNewPod:
+              containerName: centos7
+              command: [ "sh", "-c", "echo '---------Test first arg-----------'" ]
+              env:
+                - name: CUSTOM_VAR1
+                  value: custom_value1
+
+        resources: { }
+        activeDeadlineSeconds: 21600
+      triggers:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - centos7
+            from:
+              kind: ImageStreamTag
+              namespace: openiam-app
+              name: 'centos7:latest'
+            lastTriggeredImage: >-
+              image-registry.openshift-image-registry.svc:5000/openiam-app/centos7@sha256:001ec5d1b463d8d62c87b11ef9ca64603e6dd2eb88edadcb4f70f1c593aa83af
+        - type: ConfigChange
+      replicas: 1
+      revisionHistoryLimit: 10
+      test: false
+      selector:
+        app: centos7
+        deploymentconfig: centos7
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: centos7
+            deploymentconfig: centos7
+          annotations:
+            openshift.io/generated-by: OpenShiftWebConsole
+        spec:
+          volumes:
+            - name: vault-server-storage
+              persistentVolumeClaim:
+                claimName: vault-server-storage-pvc
+            - name: vault-client-storage
+              persistentVolumeClaim:
+                claimName: vault-client-storage-pvc
+            - name: vault-seal-storage
+              persistentVolumeClaim:
+                claimName: vault-seal-storage-pvc
+            - name: rabbitmq-cert-storage
+              persistentVolumeClaim:
+                claimName: rabbitmq-cert-storage-pvc
+          containers:
+            - name: centos7
+              image: >-
+                image-registry.openshift-image-registry.svc:5000/openiam-app/centos7@sha256:001ec5d1b463d8d62c87b11ef9ca64603e6dd2eb88edadcb4f70f1c593aa83af
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+                - containerPort: 8443
+                  protocol: TCP
+              resources: { }
+              command:
+                - java
+                args:
+                  - '-jar'
+                  - /opt/app-root/springboots2idemo.jar
+              volumeMounts:
+                - name: vault-server-storage
+                  mountPath: /mnt/vault-server-storage
+                - name: vault-client-storage
+                  mountPath: /mnt/vault-client-storage
+                - name: vault-seal-storage
+                  mountPath: /mnt/vault-seal-storage
+                - name: rabbitmq-cert-storage
+                  mountPath: /mnt/rabbitmq-cert-storage
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: { }
+          schedulerName: default-scheduler

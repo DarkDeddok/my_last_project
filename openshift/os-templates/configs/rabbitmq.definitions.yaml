@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbitmq-load-definition
+type: Opaque
+stringData:
+  load_definition.json: |-
+    {
+      "users": [
+          {
+            "name": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+            "password": {{ .Values.openiam.vault.secrets.rabbitmq.password | quote }},
+            "tags": "administrator"
+          }
+      ],
+      "vhosts": [
+          {
+            "name": "/"
+          },
+          {"name": "openiam_am"},
+          {"name": "openiam_idm"},
+          {"name": "openiam_audit"},
+          {"name": "openiam_common"},
+          {"name": "openiam_connector"},
+          {"name": "openiam_activiti"},
+          {"name": "openiam_user"},
+          {"name": "openiam_groovy_manager"},
+          {"name": "openiam_synchronization"},
+          {"name": "openiam_bulk_synchronization"},
+          {"name": "openiam_ext_log"},
+          {"name": "openiam_reconciliation"},
+          {"name": "openiam_bulk_reconciliation"},
+          {"name": "openiam_business_rule"}
+      ],
+      "permissions": [
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_am",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_idm",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_audit",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_common",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_connector",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_activiti",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_user",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_groovy_manager",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_synchronization",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_bulk_synchronization",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_reconciliation",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_bulk_reconciliation",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_ext_log",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          },
+          {
+              "user": {{ .Values.openiam.vault.secrets.rabbitmq.username | quote }},
+              "vhost": "openiam_business_rule",
+              "configure": ".*",
+              "write": ".*",
+              "read": ".*"
+          }
+      ]
+    }

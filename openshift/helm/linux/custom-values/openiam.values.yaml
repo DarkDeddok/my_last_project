@@ -1,0 +1,116 @@
+openiam:
+  ui:
+    securityContext:
+      fsGroup: null
+  esb:
+    securityContext:
+      fsGroup: null
+  business_rule_manager:
+    securityContext:
+      fsGroup: null
+  idm:
+    securityContext:
+      fsGroup: null
+  synchronization:
+    securityContext:
+      fsGroup: null
+  reconciliation:
+    securityContext:
+      fsGroup: null
+  groovy_manager:
+    securityContext:
+      fsGroup: null
+  http_source_adapter:
+    securityContext:
+      fsGroup: null
+  workflow:
+    securityContext:
+      fsGroup: null
+  authmanager:
+    securityContext:
+      fsGroup: null
+  connectors:
+    salesforce:
+      securityContext:
+        fsGroup: null
+    ldap:
+      securityContext:
+        fsGroup: null
+    jdbc:
+      securityContext:
+        fsGroup: null
+    google:
+      securityContext:
+        fsGroup: null
+    aws:
+      securityContext:
+        fsGroup: null
+    freshdesk:
+      securityContext:
+        fsGroup: null
+    linux:
+      securityContext:
+        fsGroup: null
+    oracle_ebs:
+      securityContext:
+        fsGroup: null
+    oracle:
+      securityContext:
+        fsGroup: null
+    scim:
+      securityContext:
+        fsGroup: null
+    script:
+      securityContext:
+        fsGroup: null
+    rexx:
+      securityContext:
+        fsGroup: null
+    saps4hana:
+      securityContext:
+        fsGroup: null
+    freshservice:
+      securityContext:
+        fsGroup: null
+    tableau:
+      securityContext:
+        fsGroup: null
+    oracle_idcs:
+      securityContext:
+        fsGroup: null
+    workday:
+      securityContext:
+        fsGroup: null
+    adp:
+      securityContext:
+        fsGroup: null
+    ipa:
+      securityContext:
+        fsGroup: null
+    box:
+      securityContext:
+        fsGroup: null
+    boomi:
+      securityContext:
+        fsGroup: null
+    lastpass:
+      securityContext:
+        fsGroup: null
+    kronos:
+      securityContext:
+        fsGroup: null
+    thales:
+      securityContext:
+        fsGroup: null
+    postgresql:
+      securityContext:
+        fsGroup: null
+  emailmanager:
+    securityContext:
+      fsGroup: null
+  devicemanager:
+    securityContext:
+      fsGroup: null
+  sasmanager:
+    securityContext:
+      fsGroup: null

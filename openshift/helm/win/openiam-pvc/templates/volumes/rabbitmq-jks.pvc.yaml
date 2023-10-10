@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: openiam-pvc-rabbitmq-jks
+  labels:
+    app: openiam-pvc-rabbitmq-jks
+    openiam_collect_logs: 'true'
+spec:
+  accessModes:
+  {{- range .Values.openiam.rabbitmq.volume.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.openiam.rabbitmq.volume.size | quote }}
+{{- if .Values.openiam.rabbitmq.volume.storageClass }}
+{{- if (eq "-" .Values.openiam.rabbitmq.volume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.openiam.rabbitmq.volume.storageClass }}"
+{{- end }}
+{{- end }}

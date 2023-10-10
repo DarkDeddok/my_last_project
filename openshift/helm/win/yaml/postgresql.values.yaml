@@ -1,0 +1,18 @@
+initdbScriptsConfigMap: postgresql-initdbscripts
+postgresqlPassword: "%DB_ROOT_PASSWORD%"
+resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "1024Mi"
+image:
+  registry: "%DOCKER_REGISTRY%"
+  repository: "%DOCKER_IMAGE_PREFIX%%DOCKER_REGISTRY_SEPARATOR%postgres-k8"
+  tag: "debian-%OPENIAM_VERSION_NUMBER%-%BUILD_ENVIRONMENT%"
+  pullPolicy: "%IMAGE_PULL_POLICY%"
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistryKeySecretName

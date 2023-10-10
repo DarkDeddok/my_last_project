@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-initdbscripts
+  labels:
+    openiam_collect_logs: 'true'
+data:
+  V0.0.0.0.000__initialization.sql: |-
+    CREATE database {{ .Values.openiam.database.jdbc.openiam.databaseName }} DEFAULT CHARACTER SET utf8 CHARACTER SET = utf8;
+    CREATE database {{ .Values.openiam.database.jdbc.activiti.databaseName }} DEFAULT CHARACTER SET utf8 CHARACTER SET = utf8;
+
+    CREATE USER '{{ .Values.openiam.vault.secrets.jdbc.openiam.username }}'@'%' IDENTIFIED BY '{{ .Values.openiam.vault.secrets.jdbc.openiam.password }}';
+    CREATE USER '{{ .Values.openiam.vault.secrets.jdbc.activiti.username }}'@'%' IDENTIFIED BY '{{ .Values.openiam.vault.secrets.jdbc.activiti.password }}';
+
+    GRANT ALL ON *.* TO '{{ .Values.openiam.vault.secrets.jdbc.openiam.username }}'@'%';
+    GRANT ALL ON {{ .Values.openiam.database.jdbc.activiti.databaseName }}.* TO '{{ .Values.openiam.vault.secrets.jdbc.activiti.username }}'@'%';
+
+    FLUSH PRIVILEGES;

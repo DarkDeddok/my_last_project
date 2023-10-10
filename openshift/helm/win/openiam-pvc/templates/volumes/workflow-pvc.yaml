@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: openiam-pvc-storage-activiti
+  labels:
+    app: openiam-pvc-storage-activiti
+    openiam_collect_logs: 'true'
+spec:
+  accessModes:
+  {{- range .Values.openiam.workflow.volume.activiti.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.openiam.workflow.volume.activiti.size | quote }}
+{{- if .Values.openiam.workflow.volume.activiti.storageClass }}
+{{- if (eq "-" .Values.openiam.workflow.volume.activiti.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.openiam.workflow.volume.activiti.storageClass }}"
+{{- end }}
+{{- end }}

@@ -1,0 +1,34 @@
+
+image:
+
+  registry: "%DOCKER_REGISTRY%"
+  repository: "%DOCKER_IMAGE_PREFIX%%DOCKER_REGISTRY_SEPARATOR%cassandra"
+  tag: "debian-%OPENIAM_VERSION_NUMBER%-%BUILD_ENVIRONMENT%"
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: "%IMAGE_PULL_POLICY%"
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+  ## Enable debug mode
+  ##
+  debug: false
+
+jvm:
+  maxHeapSize: 2G
+  newHeapSize: 800M
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "4Gi"
+  limits:
+    cpu: "1000m"
+    memory: "4Gi"

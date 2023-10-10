@@ -1,0 +1,159 @@
+---
+version: 2
+
+jobs:
+  build_helm:
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/Etc/UTC"
+      OPENIAM_VERSION_NUMBER: "4.2.1.3"
+      HELM_CHART_VERSION: "4.2.1-3"
+      JFROG_CLI_OFFER_CONFIG: false
+      TERM: dumb
+      ADDITIONAL_CURL_ARGS: "-L"
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+             .ci/setup.sh
+      - run:
+          name: Build
+          command: |
+             .ci/build.sh
+      - run:
+          name: Deploy
+          command: |
+              .ci/deploy.sh
+  test_lke:
+    name: "Test with Linode k8s"
+    docker:
+      - image: circleci/python:3.6.4
+    resource_class: medium
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+      TZ: "/usr/share/zoneinfo/Etc/UTC"
+      OPENIAM_VERSION_NUMBER: "4.2.1.3"
+      HELM_CHART_VERSION: "4.2.1-3"
+      TERM: dumb
+      ADDITIONAL_CURL_ARGS: "-L"
+    steps:
+      - checkout
+      - run:
+          name: Install Linode-cli
+          command: |
+              .ci/lke.test.sh
+  deploy_to_qa:
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/Etc/UTC"
+      OPENIAM_VERSION_NUMBER: "4.2.1.3"
+      JFROG_CLI_OFFER_CONFIG: false
+      TERM: dumb
+      ADDITIONAL_CURL_ARGS: "-L"
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+             .ci/setup.sh
+      - run:
+          name: Deploy to QA
+          command: |
+             .ci/promote.sh dev qa
+  deploy_to_prod:
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/Etc/UTC"
+      OPENIAM_VERSION_NUMBER: "4.2.1.3"
+      JFROG_CLI_OFFER_CONFIG: false
+      TERM: dumb
+      ADDITIONAL_CURL_ARGS: "-L"
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+             .ci/setup.sh
+      - run:
+          name: Deploy to PROD
+          command: |
+             .ci/promote.sh qa prod
+  deploy_3rd_party_helm_charts:
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/Etc/UTC"
+      OPENIAM_VERSION_NUMBER: "4.2.1.3"
+      JFROG_CLI_OFFER_CONFIG: false
+      TERM: dumb
+      ADDITIONAL_CURL_ARGS: "-L"
+      REDIS_CHART_VERSION: "17.3.1"
+      ELASTICSEARCH_CHART_VERSION: "7.16.2"
+      MARIADB_CHART_VERSION: "10.5.1"
+      MARIADB_GALERA_CHART_VERSION: "7.4.5"
+      CONSUL_CHART_VERSION: "0.48.0"
+      RABBITMQ_CHART_VERSION: "10.1.16"
+      POSGRESQL_CHART_VERSION: "10.16.2"
+      STASH_VERSION: "v2022.09.29"
+      CASSANDRA_CHART_VERSION: "9.2.5"
+      NFS_CHART_VERSION: "1.4.0"
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+             .ci/setup.sh
+      - run:
+          name: Deploy 3rd party helm charts
+          command: |
+             .ci/deploy_3rd_party_artifacts.sh
+
+
+workflows:
+  version: 2
+  build_local:
+    jobs:
+      - test_lke:
+          requires:
+            - build_helm
+            - approve_lke
+      - build_helm
+      - approve_lke:
+         type: approval
+      - approve_3rd_party_helm_chart_deployment:
+         type: approval
+      - deploy_3rd_party_helm_charts:
+          requires:
+            - approve_3rd_party_helm_chart_deployment
+      - approve_qa:
+         type: approval
+         requires:
+            - build_helm
+         filters:
+            branches:
+               only:
+               - development
+               - /RELEASE-[0-9]\.[0-9]\.[0-9]*(\.+[0-9]{1,})?/
+      - deploy_to_qa:
+         requires:
+            - approve_qa
+      - approve_prod:
+         type: approval
+         requires:
+            - deploy_to_qa
+         filters:
+            branches:
+               only:
+               - development
+               - /RELEASE-[0-9]\.[0-9]\.[0-9]*(\.+[0-9]{1,})?/
+      - deploy_to_prod:
+         requires:
+            - approve_prod

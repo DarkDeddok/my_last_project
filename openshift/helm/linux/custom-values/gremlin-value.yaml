@@ -1,0 +1,6 @@
+podSecurityContext:
+  enabled: false
+  runAsUser: null
+
+containerSecurityContext:
+  runAsUser: null

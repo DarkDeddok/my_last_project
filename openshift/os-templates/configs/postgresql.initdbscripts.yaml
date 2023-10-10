@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-initdbscripts
+  labels:
+    openiam_collect_logs: 'true'
+data:
+  V0.0.0.0.000__initialization.sql: |-
+    DO $$
+    BEGIN
+      CREATE USER "{{ .Values.openiam.vault.secrets.jdbc.openiam.username }}" WITH PASSWORD '{{ .Values.openiam.vault.secrets.jdbc.openiam.password }}';
+      EXCEPTION WHEN OTHERS THEN
+      RAISE NOTICE 'not creating role user {{ .Values.openiam.vault.secrets.jdbc.openiam.username }} -- it already exists';
+    END
+    $$;
+
+    DO $$
+    BEGIN
+      CREATE USER "{{ .Values.openiam.vault.secrets.jdbc.activiti.username }}" WITH PASSWORD '{{ .Values.openiam.vault.secrets.jdbc.activiti.password }}';
+      EXCEPTION WHEN OTHERS THEN
+      RAISE NOTICE 'not creating role user {{ .Values.openiam.vault.secrets.jdbc.activiti.username }} -- it already exists';
+    END
+    $$;
+
+    CREATE database {{ .Values.openiam.database.jdbc.openiam.databaseName }} ENCODING = utf8;
+    CREATE database {{ .Values.openiam.database.jdbc.activiti.databaseName }} ENCODING = utf8;
+
+    ALTER DATABASE {{ .Values.openiam.database.jdbc.openiam.databaseName }} OWNER to {{ .Values.openiam.vault.secrets.jdbc.openiam.username }};
+    ALTER DATABASE {{ .Values.openiam.database.jdbc.activiti.databaseName }} OWNER to {{ .Values.openiam.vault.secrets.jdbc.activiti.username }};

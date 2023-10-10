@@ -1,0 +1,100 @@
+initdbScriptsConfigMap: mariadb-initdbscripts
+primary:
+  resources:
+    requests:
+      memory: "512Mi"
+    limits:
+      memory: "1024Mi"
+  ## @param primary.configuration [string] MariaDB Primary configuration to be injected as ConfigMap
+  ## ref: https://mysql.com/kb/en/mysql/configuring-mysql-with-mycnf/#example-of-configuration-file
+  ##
+  configuration: |-
+    [mysqld]
+    # skip-networking and skip-bind-address added when migrating over to alpine
+    skip-networking=0
+    skip-bind-address
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mariadb
+    plugin_dir=/opt/bitnami/mariadb/plugin
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    tmpdir=/opt/bitnami/mariadb/tmp
+    max_allowed_packet=16M
+    # bound to 0.0.0.0 when migrating over to alpine
+    bind-address=0.0.0.0
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    log-error=/opt/bitnami/mariadb/logs/mysqld.log
+    character-set-server=UTF8
+    collation-server=utf8_general_ci
+    slow_query_log=0
+    slow_query_log_file=/opt/bitnami/mariadb/logs/mysqld.log
+    long_query_time=10.0
+
+    # added by Lev B. so that log size of mariadb doesn't grow exponentially
+    # this is the only customization of this variable
+    expire_logs_days=30
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    default-character-set=UTF8
+    plugin_dir=/opt/bitnami/mariadb/plugin
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+
+secondary:
+  resources:
+    requests:
+      memory: "512Mi"
+    limits:
+      memory: "1024Mi"
+  ## @param secondary.configuration [string] MariaDB Secondary configuration to be injected as ConfigMap
+  ## ref: https://mysql.com/kb/en/mysql/configuring-mysql-with-mycnf/#example-of-configuration-file
+  ##
+  configuration: |-
+    [mysqld]
+    # skip-networking and skip-bind-address added when migrating over to alpine
+    skip-networking=0
+    skip-bind-address
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mariadb
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    tmpdir=/opt/bitnami/mariadb/tmp
+    max_allowed_packet=16M
+    bind-address=0.0.0.0
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    log-error=/opt/bitnami/mariadb/logs/mysqld.log
+    character-set-server=UTF8
+    collation-server=utf8_general_ci
+
+    # added by Lev B. so that log size of mariadb doesn't grow exponentially
+    # this is the only customization of this variable
+    expire_logs_days=30
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    default-character-set=UTF8
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+
+image:
+  registry: "${DOCKER_REGISTRY}"
+  repository: "${DOCKER_IMAGE_PREFIX}${DOCKER_REGISTRY_SEPARATOR}mariadb-k8"
+  tag: "debian-${OPENIAM_VERSION_NUMBER}-${BUILD_ENVIRONMENT}"
+  pullPolicy: "${IMAGE_PULL_POLICY}"
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistryKeySecretName

@@ -1,0 +1,30 @@
+# Default values for openiam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+ingress:
+  enabled: false
+global:
+  openshift: true
+openiam:
+  image:
+    environment: %BUILD_ENVIRONMENT%
+    pullPolicy: %IMAGE_PULL_POLICY%
+    version: "%OPENIAM_VERSION_NUMBER%"
+    prefix: "%DOCKER_IMAGE_PREFIX%"
+    registryPrefixSeparator: "%DOCKER_REGISTRY_SEPARATOR%"
+    registry: "%DOCKER_REGISTRY%"
+    credentialsJSON:
+    credentials:
+      registry: "%DOCKER_REGISTRY%"
+      username: "%DOCKERHUB_USERNAME%"
+      password: "%DOCKERHUB_PASSWORD%"
+  vault:
+    openPorts: false
+    keypass: ""
+    resources:
+      requests:
+        memory: "192Mi"
+      limits:
+        memory: "192Mi"
+    nodeSelector: {}
+    tolerations: []

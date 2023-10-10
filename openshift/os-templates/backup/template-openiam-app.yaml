@@ -1,0 +1,281 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: template-openiam-app
+parameters:
+  - name: BUILD_ENVIRONMENT
+    displayName: Build environment
+    description: Build environment
+    value: qa
+    required: true
+  - name: OPENIAM_VERSION_NUMBER
+    displayName: OpenIAM version number
+    description: OpenIAM version number
+    value: 4.2.1.1
+    required: true
+  - name: OPENIAM_BASH_LOG_LEVEL
+    displayName: Openiam bash log level
+    description: Openiam bash log level
+    value: INFO
+    required: true
+  - name: APP_NAME
+    displayName: Application name
+    description: Application name
+    value: open-iam
+    required: true
+  - name: DOCKER_IMAGE_PREFIX
+    displayName: Docker image prefix
+    description: Docker image prefix
+    value: openiamdocker
+    required: true
+  - name: DOCKER_REGISTRY
+    displayName: Docker registry
+    description: Docker registry
+    value: docker.io
+    required: true
+
+  - name: OPENIAM_DB_NAME
+    displayName: OpenIAM DB name
+    description: OpenIAM DB name
+    value: openiam
+    required: true
+  - name: OPENIAM_DB_USERNAME
+    displayName: OpenIAM DB username
+    description: OpenIAM DB username
+    value: IAMUSER
+    required: true
+  - name: OPENIAM_DB_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: OpenIAM DB password
+
+  - name: ACTIVITI_DB_NAME
+    displayName: Activiti DB name
+    description: Activiti DB name
+    value: activiti
+    required: true
+  - name: ACTIVITI_DB_USERNAME
+    displayName: Activiti DB username
+    description: Activiti DB username
+    value: ACTIVITI
+    required: true
+  - name: ACTIVITI_DB_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Activiti DB password
+
+  - name: DB_ROOT_USER
+    displayName: DB root username
+    description: DB root username
+    value: openiam
+    required: true
+  - name: DB_ROOT_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: DB root password
+
+  - name: RABBITMQ_HOST
+    displayName: Rabbitmq host
+    description: Rabbitmq host
+    value: ${APP_NAME}-rabbitmq
+    required: true
+  - name: RABBITMQ_USERNAME
+    displayName: Rabbitmq username
+    description: Rabbitmq username
+    value: openiam
+    required: true
+  - name: RABBITMQ_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Rabbitmq password
+  - name: RABBIT_JKS_KEY_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Rabbit jks key password
+
+  - name: IMAGE_PULL_POLICY
+    displayName: Image pull policy
+    description: Image pull policy
+    value: Always
+    required: true
+  - name: VAULT_KEYPASS
+    displayName: Java keystore password
+    description: Java keystore password
+    value: changeit
+    required: true
+  - name: DOCKERHUB_USERNAME
+    displayName: DockerHub user name
+    description: DockerHub user name
+    value: https://github.com/sclorg/cakephp-ex.git
+    required: true
+  - name: REDIS_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Redis password
+
+  - name: JKS_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: JKS password
+  - name: JKS_KEY_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: JKS key password
+  - name: COOKIE_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Cookie key password
+  - name: COMMON_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Common key password
+  - name: VAULT_KEY_PASS
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Vault key password
+
+  - name: CASSANDRA_PASSWORD
+    from: '[A-Z0-9]{32}'
+    generate: expression
+    description: Cassandra jks key password
+  - name: CASSANDRA_PERISTENT_SIZE
+    displayName: Cassandra persistent size
+    description: Cassandra persistent size
+    value: 5Gi
+    required: true
+  - name: CASSANDRA_SERVICE_NODEPRORT_CQL
+    displayName: Cassandra service nodeport cql
+    description: Cassandra service nodeport cql
+    value: "9042"
+    required: true
+  - name: CASSANDRA_REPLICA_COUNT
+    displayName: Cassandra replica count
+    description: Cassandra replica count
+    value: "1"
+    required: true
+
+
+objects:
+
+
+# --------- redis --------------
+
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: redis
+    spec:
+      ports:
+        - name: redis
+          protocol: TCP
+          port: 6379
+          targetPort: 6379
+      selector:
+        name: redis
+      type: ClusterIP
+      sessionAffinity: None
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+
+
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: openiam-redis
+    spec:
+      lookupPolicy:
+        local: false
+      tags:
+        - name: debian-4.2.1.1-prod
+          annotations:
+            openshift.io/generated-by: OpenShiftWebConsole
+            openshift.io/imported-from: 'openiamdocker/redis:debian-4.2.1.1-prod'
+          from:
+            kind: DockerImage
+            name: 'openiamdocker/redis:debian-4.2.1.1-prod'
+          generation: 2
+          importPolicy: { }
+          referencePolicy:
+            type: Local
+
+
+  - kind: DeploymentConfig
+    apiVersion: apps.openshift.io/v1
+    metadata:
+      name: ${APP_NAME}-redis
+      namespace: ${APP_NAME}
+    spec:
+      strategy:
+        type: Rolling
+        rollingParams:
+          updatePeriodSeconds: 1
+          intervalSeconds: 1
+          timeoutSeconds: 600
+          maxUnavailable: 25%
+          maxSurge: 25%
+        resources: { }
+        activeDeadlineSeconds: 21600
+      triggers:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - openiam-redis
+            from:
+              kind: ImageStreamTag
+              namespace: ${APP_NAME}
+              name: 'openiam-redis:debian-4.2.1.1-prod'
+            lastTriggeredImage: >-
+              image-registry.openshift-image-registry.svc:5000/openiam-app/openiam-redis@sha256:083db3f45cc0f000678229b22a6237c8ad1b33115dd68f92de6bf8ba5c3af0c7
+        - type: ConfigChange
+      replicas: 2
+      revisionHistoryLimit: 10
+      test: false
+      selector:
+        app: openiam-redis
+        deploymentconfig: openiam-redis
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: openiam-redis
+            deploymentconfig: openiam-redis
+          annotations:
+            openshift.io/generated-by: OpenShiftWebConsole
+        spec:
+          volumes:
+            - name: vault-server-storage
+              persistentVolumeClaim:
+                claimName: vault-server-storage-pvc
+          containers:
+            - name: openiam-redis
+              image: >-
+                image-registry.openshift-image-registry.svc:5000/openiam-app/openiam-redis@sha256:083db3f45cc0f000678229b22a6237c8ad1b33115dd68f92de6bf8ba5c3af0c7
+              ports:
+                - containerPort: 6379
+                  protocol: TCP
+#              env:
+#                - name: OPENIAM_LOG_LEVEL
+#                  valurForm:
+#                    secretKeyRef:
+#                      name: secrets
+#                      key: logLevelRedis
+#                - name: REDIS_PASSWORD
+#                  valueFrom:
+#                    secretKeyRef:
+#                      name: secrets
+#                      key: database-password
+              volumeMounts:
+                - name: vault-server-storage
+                  mountPath: /data/openiam/conf/vault/server
+              resources: { }
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: { }
+          schedulerName: default-scheduler

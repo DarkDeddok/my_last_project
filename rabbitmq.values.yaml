@@ -1,0 +1,80 @@
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+##
+
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.storageClass Global StorageClass for Persistent Volume(s)
+##
+global:
+  imageRegistry: "${DOCKER_REGISTRY}"
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+  storageClass: ""
+
+## @section RabbitMQ Image parameters
+## Bitnami RabbitMQ image version
+## ref: https://hub.docker.com/r/bitnami/rabbitmq/tags/
+## @param image.registry RabbitMQ image registry
+## @param image.repository RabbitMQ image repository
+## @param image.tag RabbitMQ image tag (immutable tags are recommended)
+## @param image.pullPolicy RabbitMQ image pull policy
+## @param image.pullSecrets Specify docker-registry secret names as an array
+## @param image.debug Set to true if you would like to see extra information on logs
+##
+image:
+  registry: "${DOCKER_REGISTRY}"
+  repository: "${DOCKER_IMAGE_PREFIX}${DOCKER_REGISTRY_SEPARATOR}rabbitmq-k8"
+  tag: "debian-${OPENIAM_VERSION_NUMBER}-${BUILD_ENVIRONMENT}"
+  ## set to true if you would like to see extra information on logs
+  ## It turns BASH and/or NAMI debugging in the image
+  ##
+  debug: true
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: "${IMAGE_PULL_POLICY}"
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## Example:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+
+# default stateful and liveness probes don't take into account the custom path to the management app (/rabbitmq)
+# so we have to override it
+livenessProbe:
+  enabled: false
+readinessProbe:
+  enabled: false
+customLivenessProbe:
+  initialDelaySeconds: 120
+  timeoutSeconds: 20
+  periodSeconds: 30
+  failureThreshold: 6
+  successThreshold: 1
+  exec:
+    command:
+      - sh
+      - -ec
+      - test "$(curl -f --user $RABBITMQ_USERNAME:$RABBITMQ_PASSWORD 127.0.0.1:15672/rabbitmq/api/healthchecks/node)" = '{"status":"ok"}'
+customReadinessProbe:
+  initialDelaySeconds: 10
+  timeoutSeconds: 20
+  periodSeconds: 30
+  failureThreshold: 3
+  successThreshold: 1
+  exec:
+    command:
+      - sh
+      - -ec
+      - curl -f --user $RABBITMQ_USERNAME:$RABBITMQ_PASSWORD 127.0.0.1:15672/rabbitmq/api/health/checks/local-alarms
+podManagementPolicy: Parallel

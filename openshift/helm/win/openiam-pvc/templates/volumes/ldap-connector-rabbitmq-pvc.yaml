@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: openiam-pvc-ldap-connector-rabbitmq
+  labels:
+    app: openiam-pvc-ldap-connector-rabbitmq
+    openiam_collect_logs: 'true'
+spec:
+  accessModes:
+  {{- range .Values.openiam.ldap_connector_rabbitmq.volume.ldap_connector_rabbitmq.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.openiam.ldap_connector_rabbitmq.volume.ldap_connector_rabbitmq.size | quote }}
+{{- if .Values.openiam.ldap_connector_rabbitmq.volume.ldap_connector_rabbitmq.storageClass }}
+{{- if (eq "-" .Values.openiam.ldap_connector_rabbitmq.volume.ldap_connector_rabbitmq.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.openiam.ldap_connector_rabbitmq.volume.ldap_connector_rabbitmq.storageClass }}"
+{{- end }}
+{{- end }}
